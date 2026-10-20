@@ -10,7 +10,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
-EPOCHS = 3
+EPOCHS = 10
 BATCH_SIZE = 64
 LEARNING_RATE = 1e-3
 
@@ -86,10 +86,15 @@ def evaluate():
 if __name__ == "__main__":
     print(f"Training on {device}, {sum(p.numel() for p in model.parameters()):,} parameters")
     start = time.time()
+    best_acc, best_epoch = 0.0, 0
     for epoch in range(1, EPOCHS + 1):
         avg_loss = train_one_epoch()
         acc = evaluate()
-        print(f"Epoch {epoch}: train loss {avg_loss:.4f} | test accuracy {acc:.2%}")
+        marker = ""
+        if acc > best_acc:  # only keep the best epoch, so later overfitting can't make it worse
+            best_acc, best_epoch = acc, epoch
+            torch.save(model.state_dict(), "digit_model.pt")
+            marker = "  <- best so far, saved"
+        print(f"Epoch {epoch}: train loss {avg_loss:.4f} | test accuracy {acc:.2%}{marker}")
     print(f"Done in {time.time() - start:.0f}s")
-    torch.save(model.state_dict(), "digit_model.pt")
-    print("Saved weights to digit_model.pt")
+    print(f"Saved epoch {best_epoch} ({best_acc:.2%}) to digit_model.pt")
