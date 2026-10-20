@@ -11,4 +11,4 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python finetune.py   # fine-tune on your drawings, saves my_model.pt
 ```
 
-See [NOTES.md](NOTES.md) for how it works, key concepts, and experiment results, and [TRAINING_METHODS.md](TRAINING_METHODS.md) for an overview of AI training methods in general.
+See [NOTES.md](NOTES.md) for how it works, key concepts, and experiment results, and [AI Training Methods](<AI Training Methods/TRAINING_METHODS.md>) for an overview of AI training methods in general.
