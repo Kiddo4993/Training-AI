@@ -94,8 +94,12 @@ def configure_finetuning(model):
         torch.optim.Adam(model.classifier.parameters(), lr=...)
     (train.py used lr=1e-3 from scratch.)
     """
-    # TODO(you): pick a freezing strategy + learning rate (see NOTES.md, "Fine-tuning")
-    raise NotImplementedError("Fill in configure_finetuning() in finetune.py")
+    # Freeze the conv layers: their stroke/shape detectors already work, and with only
+    # ~80 drawings, retraining them would overfit and forget MNIST. Retrain just the
+    # classifier, with a learning rate 10x smaller than training from scratch.
+    for p in model.features.parameters():
+        p.requires_grad = False
+    return torch.optim.Adam(model.classifier.parameters(), lr=1e-4)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # Digit Recognizer
 
-A small convolutional neural network that reads handwritten digits. It's trained from scratch on MNIST with PyTorch (98.9% test accuracy, about 47s on an Apple Silicon GPU) and can then be fine-tuned on your own handwriting.
+A small convolutional neural network that reads handwritten digits. It's trained from scratch on MNIST with PyTorch (99.3% test accuracy, about 2 min on an Apple Silicon GPU) and can then be fine-tuned on your own handwriting.
 
 ## Quick start
 ```bash

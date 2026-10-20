@@ -5,7 +5,27 @@
 ## What I built
 A **convolutional neural network (CNN)** that looks at a 28×28 picture of a handwritten digit and says which digit (0–9) it is. It was trained on **MNIST**, a classic dataset of 70,000 handwritten digits (60k for training, 10k for testing).
 
-## Results (first run)
+## Results
+
+### Run 2: 10 epochs, keep the best epoch (2026-10-20), current model
+| Epoch | Train loss | Test accuracy |
+|---|---|---|
+| 1 | 0.1551 | 98.04% |
+| 2 | 0.0521 | 98.96% |
+| 3 | 0.0379 | 98.86% |
+| 4 | 0.0299 | 99.18% |
+| 5 | 0.0231 | 99.06% |
+| 6 | 0.0200 | 99.13% |
+| 7 | 0.0170 | 99.20% |
+| 8 | 0.0150 | 99.25% |
+| **9** | **0.0120** | **99.29%** ← saved |
+| 10 | 0.0116 | 99.25% |
+
+- Trained in **118s**. **99.29%** is up from 98.87% in run 1
+- `train.py` now saves only the **best epoch** (a simple form of *early stopping*), so epoch 10's slight dip didn't overwrite epoch 9
+- Train loss fell every epoch, but test accuracy went up and down. Test accuracy is the number that matters, because it measures digits the model has never seen
+
+### Run 1: 3 epochs (2026-10-07)
 | Epoch | Train loss | Test accuracy |
 |---|---|---|
 | 1 | 0.1574 | 98.45% |
@@ -23,14 +43,14 @@ A **convolutional neural network (CNN)** that looks at a 28×28 picture of a han
 | `predict.py` | Loads the trained model and shows it guessing random test digits (drawn in ASCII) |
 | `draw.py` | Browser drawing pad (localhost:8000) to collect my own digits |
 | `finetune.py` | Fine-tunes the model on my drawings → `my_model.pt` |
-| `digit_model.pt` | The trained weights. This file *is* the trained AI |
+| `digit_model.pt` | The trained weights (best epoch, 99.29%). This file *is* the trained AI |
 | `data/` | The downloaded MNIST dataset |
 | `.venv/` | Python environment with PyTorch installed |
 
 ## How to run
 ```bash
 cd ~/Desktop/ai
-.venv/bin/python train.py     # train again (~1 min)
+.venv/bin/python train.py     # train again (~2 min)
 .venv/bin/python predict.py   # watch it guess
 ```
 
@@ -111,7 +131,7 @@ The MNIST model has never seen my handwriting. 50–100 drawings aren't enough t
 
 Only 20 test images means each one is worth 5%, so these numbers are noisy. More drawings give more trustworthy results.
 
-**My job:** fill in `configure_finetuning()` in `finetune.py`, deciding *what* to freeze and *how fast* to learn.
+**`configure_finetuning()`** (filled in 2026-10-20): **freezes the conv layers and retrains only the classifier at lr 1e-4**. The pretrained stroke detectors already work, and retraining them on about 80 drawings would risk overfitting and forgetting MNIST. Swap in the other strategies below to compare.
 
 | Strategy | What trains | Trade-off |
 |---|---|---|
@@ -121,10 +141,10 @@ Only 20 test images means each one is worth 5%, so these numbers are noisy. More
 
 | Strategy I tried | lr | My handwriting before → after | MNIST after |
 |---|---|---|---|
-| | | | |
+| Freeze conv, train classifier (default) | 1e-4 | *(run after drawing)* | |
 
 ## Experiments to try next
-- [ ] Change `EPOCHS` to 1, then to 10. Does accuracy keep going up?
+- [x] Change `EPOCHS` to 10. Accuracy went up to 99.29% but leveled off after about epoch 7
 - [ ] Set `LEARNING_RATE` to `0.1`. What breaks?
 - [ ] Delete the Conv layers and use only Linear layers. How much worse is it?
 - [ ] Remove `Dropout`. Does overfitting get worse?
