@@ -12,3 +12,9 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 ```
 
 See [NOTES.md](NOTES.md) for how it works, key concepts, and experiment results, and [AI Training Methods](<AI Training Methods/TRAINING_METHODS.md>) for an overview of AI training methods in general.
+
+## More experiments
+| Folder | What it trains | Method |
+|---|---|---|
+| [language_model/](language_model/NOTES.md) | A tiny GPT that writes Shakespeare | Self-supervised (how LLMs are pretrained) |
+| [autoencoder/](autoencoder/NOTES.md) | A VAE that compresses digits to 2 numbers and draws new ones | Unsupervised / generative |
