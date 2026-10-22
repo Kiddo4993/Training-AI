@@ -43,6 +43,8 @@ A **convolutional neural network (CNN)** that looks at a 28×28 picture of a han
 | `predict.py` | Loads the trained model and shows it guessing random test digits (drawn in ASCII) |
 | `draw.py` | Browser drawing pad (localhost:8000) to collect my own digits |
 | `finetune.py` | Fine-tunes the model on my drawings → `my_model.pt` |
+| `my_digits/` | My 123 handwritten digit drawings |
+| `my_model.pt` | The model fine-tuned on my handwriting (93.3% on my held-out drawings) |
 | `digit_model.pt` | The trained weights (best epoch, 99.29%). This file *is* the trained AI |
 | `data/` | The downloaded MNIST dataset |
 | `.venv/` | Python environment with PyTorch installed |
@@ -141,7 +143,25 @@ Only 20 test images means each one is worth 5%, so these numbers are noisy. More
 
 | Strategy I tried | lr | My handwriting before → after | MNIST after |
 |---|---|---|---|
-| Freeze conv, train classifier (default) | 1e-4 | *(run after drawing)* | |
+| Freeze conv, train classifier (default) | 1e-4 | 90.0% → **93.3%** | 98.63% (was 99.29%) |
+
+### Results with my real handwriting (2026-10-22)
+I drew **123 digits** (12–13 of each). 2 were blank and got skipped, leaving **91 to train on and 30 held out** (3 per digit).
+
+**First look (before fine-tuning, 1 drawing each):** the base model got 9/10 right. It read my **crossed 7 as a 2 with 100% confidence**. MNIST comes mostly from American writers, who rarely cross their 7s.
+
+| Digit | Before | After |
+|---|---|---|
+| 0, 3, 5, 6, 7, 8, 9 | 3/3 each | 3/3 each |
+| 1 | 2/3 | **3/3** ✅ |
+| 2 | 2/3 | 2/3 (one read as 7) |
+| 4 | 2/3 | 2/3 (one read as 9) |
+| **Total** | **27/30 (90.0%)** | **28/30 (93.3%)** |
+
+- **All 13 of my 7s:** before 11/13, after 13/13. Most of those 13 were also in the training set, so this is a hint that it learned my crossed 7, not proof.
+- **The cost:** MNIST accuracy fell from 99.29% to 98.63%. That's a small bit of *catastrophic forgetting*, even with the conv layers frozen, because the classifier shifted toward my style.
+- **Honest takeaway:** 90% → 93.3% is **one more drawing correct** out of 30. That's a real fix (my 1s), but too small a test to call it a big win. My handwriting was already close to MNIST's style.
+- **Leftover confusions** (a 2 read as 7, a 4 read as 9) look like genuine look-alike shapes. Both could be fixed with more drawings of those digits, or by trying the "freeze nothing, tiny lr" strategy.
 
 ## Experiments to try next
 - [x] Change `EPOCHS` to 10. Accuracy went up to 99.29% but leveled off after about epoch 7
@@ -149,7 +169,7 @@ Only 20 test images means each one is worth 5%, so these numbers are noisy. More
 - [ ] Delete the Conv layers and use only Linear layers. How much worse is it?
 - [ ] Remove `Dropout`. Does overfitting get worse?
 - [ ] Try `datasets.FashionMNIST` instead (clothing pictures, a harder task)
-- [ ] Draw your own digit and have the model read it
+- [x] Draw your own digit and have the model read it (see fine-tuning results above)
 
 ## My notes
 <!-- add your own observations here -->
