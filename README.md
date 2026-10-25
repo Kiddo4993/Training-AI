@@ -18,3 +18,4 @@ See [NOTES.md](NOTES.md) for how it works, key concepts, and experiment results,
 |---|---|---|
 | [language_model/](language_model/NOTES.md) | A tiny GPT that writes Shakespeare | Self-supervised (how LLMs are pretrained) |
 | [autoencoder/](autoencoder/NOTES.md) | A VAE that compresses digits to 2 numbers and draws new ones | Unsupervised / generative |
+| [snake_rl/](snake_rl/NOTES.md) | A Snake agent that learns by playing (0.2 → 20 apples per game) | Reinforcement learning (Q-learning) |
