@@ -25,7 +25,7 @@ N_LAYERS = 4
 DROPOUT = 0.1
 LEARNING_RATE = 1e-3
 
-device = "mps" if torch.backends.mps.is_available() else "cpu"
+device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 
 # --- 1. Data -------------------------------------------------------------
 # ~1MB of Shakespeare plays. Every character gets an id (65 unique ones).

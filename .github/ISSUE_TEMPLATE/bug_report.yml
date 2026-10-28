@@ -1,0 +1,24 @@
+name: Bug report
+description: Something doesn't run or gives the wrong result
+labels: [bug]
+body:
+  - type: dropdown
+    id: project
+    attributes:
+      label: Which project?
+      options: [Digit recognizer, Handwriting fine-tune, Tiny GPT, VAE, Snake AI, Other]
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: The command you ran and the full error or output.
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: "macOS 15, Python 3.12, torch 2.8.0, Apple M2"

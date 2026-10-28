@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If this repo helped your learning or teaching, you can cite it like this."
+title: "train-ai-from-scratch: five ways to train an AI, one small project each"
+authors:
+  - given-names: Dylan
+    family-names: Duan
+license: MIT
+repository-code: "https://github.com/Kiddo4993/train-ai-from-scratch"
+keywords: [machine-learning, deep-learning, pytorch, education, reinforcement-learning, transformer, vae]

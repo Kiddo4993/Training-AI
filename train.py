@@ -14,8 +14,8 @@ EPOCHS = 10
 BATCH_SIZE = 64
 LEARNING_RATE = 1e-3
 
-# Use the Mac's GPU (Metal Performance Shaders) if available.
-device = "mps" if torch.backends.mps.is_available() else "cpu"
+# Use a GPU if there is one: NVIDIA (CUDA) or Apple Silicon (Metal Performance Shaders).
+device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 
 # --- 1. Data -------------------------------------------------------------
 # ToTensor turns a 28x28 image into numbers 0..1; Normalize centers them

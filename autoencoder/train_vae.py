@@ -22,7 +22,7 @@ LEARNING_RATE = 1e-3
 LATENT_DIM = 2   # each digit becomes 2 numbers, so the whole "digit space" can be drawn as a 2-D map
 BETA = 1.0       # weight of the KL term in vae_loss()
 
-device = "mps" if torch.backends.mps.is_available() else "cpu"
+device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 
 # --- 1. Data -------------------------------------------------------------
 # Same MNIST files as train.py. No Normalize this time: pixels stay in 0..1 so they can be

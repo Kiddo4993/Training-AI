@@ -1,0 +1,16 @@
+name: Experiment idea or result
+description: Suggest an experiment, or share a result you got from one
+labels: [experiment]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What did you try, or want to try?
+      placeholder: "Set REWARD_STEP = -0.1 in snake_rl/snake.py. The average score went from 20 to ..."
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: What does it teach?
+      description: The concept a beginner would learn from it.
