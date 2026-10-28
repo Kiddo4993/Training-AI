@@ -84,7 +84,7 @@ This works because there are only 2,048 states, so a table can list them all. Ch
 - [ ] **Short-sighted agent:** set `GAMMA = 0.0` so only immediate rewards count. What happens?
 - [ ] **Richer state:** in `state()`, add facts like "is my tail reachable?" or "danger 2 squares ahead". Can it get past 20?
 - [ ] **Bigger board:** set `SIZE = 20`. Does the same Q-table still work?
-- [ ] **Deep Q-learning:** replace the table with a small PyTorch network (reusing what you learned in the digit project)
+- [x] **Deep Q-learning:** done in [snake_dqn/](../snake_dqn/NOTES.md). A neural network plus an open-space sense averages 44 apples
 
 ## My notes
 <!-- add your own observations here -->

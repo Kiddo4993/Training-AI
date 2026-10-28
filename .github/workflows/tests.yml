@@ -21,6 +21,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
+      - uses: actions/setup-node@v4  # runs the browser demo's JS in tests/test_web_demo.py
+        with:
+          node-version: 22
       - name: Cache datasets (MNIST + Shakespeare)
         uses: actions/cache@v4
         with:

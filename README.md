@@ -8,25 +8,35 @@
   <img src="https://img.shields.io/badge/python-3.9%2B-3776AB.svg?logo=python&logoColor=white" alt="Python 3.9+">
   <img src="https://img.shields.io/badge/PyTorch-2.8-EE4C2C.svg?logo=pytorch&logoColor=white" alt="PyTorch 2.8">
   <img src="https://img.shields.io/badge/GPU-optional-success.svg" alt="GPU optional">
+  <a href="https://kiddo4993.github.io/train-ai-from-scratch/"><img src="https://img.shields.io/badge/live_demo-try_it-F2A93B.svg" alt="Live demo"></a>
 </p>
 
 <p align="center">
   <b>Learn the five main ways AI is trained by training five real models yourself, each in minutes, on a laptop.</b>
 </p>
 
+<p align="center">
+  <a href="https://kiddo4993.github.io/train-ai-from-scratch/"><b>▶ Try the live demo</b></a>: draw a digit and watch the network read it, then watch the Snake AI play. Nothing to install.
+</p>
+
+<p align="center">
+  <a href="https://kiddo4993.github.io/train-ai-from-scratch/"><img src="assets/demo-draw.gif" alt="Drawing digits in the live demo while the network predicts them" width="760"></a>
+</p>
+
 ---
 
 Most "learn AI" material either stays theoretical or hides the training inside a framework call. This repo does neither. Each project is **one small, readable PyTorch script** (or plain Python) that you run, watch learn, and then break on purpose with the experiments in its notes.
 
-| # | Project | Training method | What it learns | Result | Train time* |
-|:-:|---|---|---|---|---|
-| 1 | [**Digit recognizer**](NOTES.md) | Supervised | Read handwritten digits from 60k labeled examples | **99.29%** test accuracy | ~2 min |
-| 2 | [**Handwriting fine-tune**](NOTES.md#fine-tuning-experiment-teaching-it-my-handwriting) | Transfer learning | Adapt model #1 to *your* handwriting from ~100 drawings | **90.0% → 93.3%** | seconds |
-| 3 | [**Tiny GPT**](language_model/NOTES.md) | Self-supervised | Write Shakespeare-style text, one character at a time | val loss **1.649** | ~6 min |
-| 4 | [**VAE**](autoencoder/NOTES.md) | Unsupervised / generative | Squeeze a digit into **2 numbers**, then dream up new ones | test loss **143.4** | ~1 min |
-| 5 | [**Snake AI**](snake_rl/NOTES.md) | Reinforcement learning | Play Snake from rewards alone, with no examples | **0.2 → 20.1** apples/game | ~2 sec |
+| # | Project | Training method | What it learns | Result | Train time* | Notebook |
+|:-:|---|---|---|---|---|:-:|
+| 1 | [**Digit recognizer**](NOTES.md) | Supervised | Read handwritten digits from 60k labeled examples | **99.29%** test accuracy | ~2 min | <a href="https://colab.research.google.com/github/Kiddo4993/train-ai-from-scratch/blob/main/notebooks/01_digit_recognizer.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open in Colab"></a> |
+| 2 | [**Handwriting fine-tune**](NOTES.md#fine-tuning-experiment-teaching-it-my-handwriting) | Transfer learning | Adapt model #1 to *your* handwriting from ~100 drawings | **90.0% → 93.3%** | seconds | <a href="https://colab.research.google.com/github/Kiddo4993/train-ai-from-scratch/blob/main/notebooks/02_handwriting_finetune.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open in Colab"></a> |
+| 3 | [**Tiny GPT**](language_model/NOTES.md) | Self-supervised | Write Shakespeare-style text, one character at a time | val loss **1.649** | ~6 min | <a href="https://colab.research.google.com/github/Kiddo4993/train-ai-from-scratch/blob/main/notebooks/03_tiny_gpt.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open in Colab"></a> |
+| 4 | [**VAE**](autoencoder/NOTES.md) | Unsupervised / generative | Squeeze a digit into **2 numbers**, then dream up new ones | test loss **143.4** | ~1 min | <a href="https://colab.research.google.com/github/Kiddo4993/train-ai-from-scratch/blob/main/notebooks/04_vae.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open in Colab"></a> |
+| 5 | [**Snake AI**](snake_rl/NOTES.md) | Reinforcement learning | Play Snake from rewards alone, with no examples | **0.2 → 20.1** apples/game | ~2 sec | <a href="https://colab.research.google.com/github/Kiddo4993/train-ai-from-scratch/blob/main/notebooks/05_snake_q_learning.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open in Colab"></a> |
+| 6 | [**Snake AI, deep**](snake_dqn/NOTES.md) | Deep RL (DQN) | Same game, but a neural network replaces the table | **44.3** apples/game (2× the table) | ~3 min | <a href="https://colab.research.google.com/github/Kiddo4993/train-ai-from-scratch/blob/main/notebooks/06_snake_dqn.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open in Colab"></a> |
 
-<sub>*Measured on an Apple Silicon laptop. Works on CPU, NVIDIA (CUDA) and Apple (MPS). Trained models are included, so you can try every demo without training anything.</sub>
+<sub>*Measured on an Apple Silicon laptop. Works on CPU, NVIDIA (CUDA) and Apple (MPS). Trained models are included, so you can try every demo without training anything. Project 6 is a bonus that extends project 5.</sub>
 
 ## Quick start
 
@@ -47,7 +57,11 @@ python finetune.py                                      # ...then fine-tune on t
 python language_model/train_lm.py                       # tiny GPT
 python language_model/generate.py                       # ...then make it write
 python autoencoder/train_vae.py                         # VAE, saves images to autoencoder/samples/
+python snake_dqn/train_dqn.py                           # deep Q-learning Snake
+python snake_dqn/play.py --games 200 --compare          # ...DQN vs. Q-table vs. random
 ```
+
+No setup at all? Every project has a **Colab notebook** (see the table) that runs free in your browser.
 
 ## What you'll learn
 
@@ -58,6 +72,7 @@ Each project's `NOTES.md` explains its concepts in plain language, records real 
 3. **Handwriting fine-tune**: transfer learning, freezing layers, catastrophic forgetting, why preprocessing matters.
 4. **VAE**: learning without labels, latent spaces, the reparameterization trick, generating new data.
 5. **Tiny GPT**: tokens, attention, causal masking, temperature sampling. The same architecture as ChatGPT, at 800k parameters.
+6. **DQN Snake**: why deep RL replaces tables with networks, experience replay, target networks. It ties projects 1 and 5 together.
 
 For the big picture, read [**AI Training Methods**](<AI Training Methods/TRAINING_METHODS.md>), a one-page map of every major training approach.
 
@@ -95,6 +110,9 @@ The whole 2-D "digit space": every point is a digit the model can draw.
 <img src="autoencoder/samples/latent_map.png" alt="VAE latent space map" width="420">
 
 ### Snake AI: from random moves to 20 apples
+
+<img src="assets/snake-learning.gif" alt="The snake after 0, 300, 1,000 and 3,000 training games" width="320" align="right">
+
 | Games played | Exploration (ε) | Avg apples (last 100 games) |
 |---|---|---|
 | 250 | 0.83 | 0.4 |
@@ -102,15 +120,24 @@ The whole 2-D "digit space": every point is a digit the model can draw.
 | 1,500 | 0.01 | 11.7 |
 | 2,000 | 0.01 | **18.2** |
 
-It plateaus around 20 because it can only sense one square around its head, so it eventually coils into a trap. Giving it a richer view is one of the experiments in its notes:
+It plateaus around 20 because it can only sense one square around its head, so it eventually coils into a trap:
 
 ```
-. . . o o o o o o . . .
-. . . o o . . o o . . .
-. . o o o . . o . . . .
-. . o @ o . . o . . . .     @ = head, boxed in by its own body
-* . o o o o o o . . . .     * = the apple it wanted
+. . o o o . . o .
+. . o @ o . . o .   @ = head, boxed in
+* . o o o o o o .   * = the apple it wanted
 ```
+
+<br clear="right">
+
+### Deep Q-learning: breaking the plateau
+Project 6 swaps the table for a neural network and gives the snake one new sense: **how much of the board it could still reach after each move**. That's a continuous number, which a table can't store but a network can. Head to head on the same 200 games:
+
+| Agent | Avg apples | Best |
+|---|---|---|
+| Random | 0.1 | 1 |
+| Q-table | 21.4 | 37 |
+| **DQN** | **44.3** | **70** |
 
 ## Project structure
 
@@ -119,7 +146,11 @@ It plateaus around 20 because it can only sense one square around its head, so i
 ├── draw.py, finetune.py         # 2. handwriting fine-tune
 ├── language_model/              # 3. tiny GPT
 ├── autoencoder/                 # 4. VAE
-├── snake_rl/                    # 5. Snake AI
+├── snake_rl/                    # 5. Snake AI (Q-table)
+├── snake_dqn/                   # 6. Snake AI (deep Q-learning)
+├── notebooks/                   # one Colab notebook per project
+├── docs/                        # the live demo (GitHub Pages)
+├── scripts/                     # regenerate the demo weights and GIFs
 ├── AI Training Methods/         # one-page guide to every training method
 ├── tests/                       # checks each trained model still performs as reported
 └── NOTES.md                     # notes for projects 1 and 2 (each folder has its own)
@@ -136,7 +167,7 @@ pytest
 
 ## FAQ
 
-**Do I need a GPU?** No. Everything runs on a CPU; a GPU just makes projects 1, 3 and 4 faster. CUDA and Apple Silicon are picked up automatically.
+**Do I need a GPU?** No. Everything runs on a CPU; a GPU just makes projects 1, 3 and 4 faster. The Colab notebooks give you a free one. CUDA and Apple Silicon are picked up automatically.
 
 **How much math do I need?** None to run the projects. The notes explain the ideas (gradients, loss, probability) in plain language as they come up.
 

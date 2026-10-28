@@ -3,5 +3,5 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-for folder in (ROOT, ROOT / "snake_rl", ROOT / "language_model", ROOT / "autoencoder"):
+for folder in (ROOT, ROOT / "snake_rl", ROOT / "snake_dqn", ROOT / "language_model", ROOT / "autoencoder"):
     sys.path.insert(0, str(folder))

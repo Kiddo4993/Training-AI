@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>train-ai-from-scratch · live demo</title>
+<meta name="description" content="Draw a digit and watch a neural network read it, or watch a reinforcement learning agent play Snake. Real trained models from train-ai-from-scratch, running in your browser.">
+<meta property="og:title" content="train-ai-from-scratch · live demo">
+<meta property="og:description" content="Five ways to train an AI, one small project each. Try two of them in your browser.">
+<meta property="og:image" content="https://raw.githubusercontent.com/Kiddo4993/train-ai-from-scratch/main/assets/banner.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230E0F12'/><circle cx='16' cy='16' r='6' fill='%23F2A93B'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0E0F12;
+    --ink: #E8E4DB;
+    --ink-80: rgba(232, 228, 219, .80);
+    --ink-55: rgba(232, 228, 219, .55);
+    --ink-35: rgba(232, 228, 219, .35);
+    --ink-15: rgba(232, 228, 219, .15);
+    --ink-08: rgba(232, 228, 219, .08);
+    --amber: #F2A93B;
+    --mono: "Geist Mono", ui-monospace, monospace;
+    --serif: "Instrument Serif", Georgia, serif;
+    --gutter: clamp(16px, 4vw, 48px);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { background: var(--bg); }
+  body {
+    background: var(--bg); color: var(--ink); font-family: var(--mono); font-weight: 300;
+    font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 var(--gutter); }
+
+  /* --- top bar & title ---------------------------------------------- */
+  .topbar { display: flex; justify-content: space-between; gap: 16px; padding: 22px 0; font-size: 12px;
+            letter-spacing: .08em; text-transform: uppercase; color: var(--ink-55); }
+  .topbar nav { display: flex; gap: 20px; }
+  .topbar a { text-decoration: none; transition: color .15s; }
+  .topbar a:hover { color: var(--ink); }
+  .topbar .star { color: var(--amber); }
+  header.hero { padding: clamp(32px, 7vw, 80px) 0 clamp(28px, 4vw, 44px); border-bottom: 1px solid var(--ink-15); }
+  h1 { font-weight: 400; font-size: clamp(30px, 6.4vw, 72px); letter-spacing: -.02em; line-height: 1.05;
+       overflow-wrap: anywhere; }
+  .lede { font-family: var(--serif); font-style: italic; font-size: clamp(20px, 2.6vw, 30px); color: var(--ink-55);
+          margin-top: 14px; line-height: 1.25; max-width: 36em; }
+
+  /* --- specimen sections ---------------------------------------------- */
+  section.specimen { padding: clamp(40px, 7vw, 88px) 0; border-bottom: 1px solid var(--ink-15); }
+  .label { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; font-size: 12px; letter-spacing: .1em;
+           text-transform: uppercase; margin-bottom: 8px; }
+  .label .num { color: var(--amber); }
+  .label .metric { color: var(--ink-35); letter-spacing: .04em; text-transform: none; }
+  h2 { font-family: var(--serif); font-weight: 400; font-size: clamp(30px, 4vw, 46px); line-height: 1.1; margin-bottom: 10px; }
+  .caption { color: var(--ink-55); max-width: 62ch; margin-bottom: clamp(24px, 4vw, 40px); }
+  .caption code { color: var(--ink-80); }
+  .grid { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); gap: clamp(28px, 5vw, 64px); align-items: start; }
+  @media (max-width: 780px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+  /* corner crop-mark frame, as on the banner */
+  .frame { position: relative; padding: 18px; }
+  .frame::before, .frame::after, .frame > .c3, .frame > .c4 {
+    content: ""; position: absolute; width: 14px; height: 14px; border-color: var(--ink-35); border-style: solid; pointer-events: none;
+  }
+  .frame::before { top: 0; left: 0; border-width: 1px 0 0 1px; }
+  .frame::after { top: 0; right: 0; border-width: 1px 1px 0 0; }
+  .frame > .c3 { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+  .frame > .c4 { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+  .dotfield { background-image: radial-gradient(var(--ink-15) 1px, transparent 1.4px); background-size: 20px 20px; background-position: 10px 10px; }
+
+  canvas { display: block; width: 100%; height: auto; aspect-ratio: 1; }
+  #pad { touch-action: none; cursor: crosshair; }
+  .hint { position: absolute; inset: 18px; display: grid; place-items: center; pointer-events: none;
+          font-family: var(--serif); font-style: italic; font-size: 26px; color: var(--ink-35); transition: opacity .2s; }
+
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; }
+  button, .seg label {
+    font: inherit; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink);
+    background: transparent; border: 1px solid var(--ink-35); padding: 9px 16px; cursor: pointer; transition: border-color .15s, color .15s, background .15s;
+  }
+  button:hover, .seg label:hover { border-color: var(--ink); }
+  button:focus-visible, .seg input:focus-visible + label, input[type=range]:focus-visible { outline: 1px solid var(--amber); outline-offset: 3px; }
+  .seg { display: inline-flex; }
+  .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .seg label + input + label { border-left: none; }
+  .seg input:checked + label { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  /* --- prediction panel ---------------------------------------------- */
+  .readout { display: grid; grid-template-columns: auto 1fr; gap: 6px 28px; align-items: end; margin-bottom: 26px; }
+  .big { font-size: clamp(88px, 13vw, 140px); line-height: .82; color: var(--amber); font-weight: 400; min-width: .62em; }
+  .big.empty { color: var(--ink-15); }
+  .conf { font-size: 12px; color: var(--ink-55); letter-spacing: .06em; text-transform: uppercase; }
+  .conf b { display: block; font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 34px;
+            color: var(--ink); letter-spacing: 0; text-transform: none; line-height: 1.1; }
+  .bars { display: grid; gap: 7px; }
+  .bar { display: grid; grid-template-columns: 1.6ch 1fr 5ch; gap: 14px; align-items: center; font-size: 13px; color: var(--ink-55); }
+  .track { height: 8px; background: var(--ink-08); position: relative; }
+  .fill { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--ink-55); transition: width .18s ease-out, background .18s; }
+  .bar.top { color: var(--ink); }
+  .bar.top .fill { background: var(--amber); }
+  .bar span:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+
+  .sees { display: flex; gap: 18px; align-items: center; margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--ink-15); }
+  .sees canvas { width: 112px; flex: none; }
+  .sees p { font-size: 12px; color: var(--ink-55); }
+  .sees p b { color: var(--ink); font-weight: 400; display: block; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
+
+  /* --- snake panel --------------------------------------------------- */
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--ink-15); border-bottom: 1px solid var(--ink-15); margin: 22px 0 26px; }
+  .stat { padding: 14px 0; }
+  .stat + .stat { padding-left: 14px; border-left: 1px solid var(--ink-15); }
+  .stat small { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-35); }
+  .stat b { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: clamp(26px, 3.4vw, 36px); line-height: 1.2; font-variant-numeric: tabular-nums; }
+  .stat.hi b { color: var(--amber); }
+  .speed { display: flex; align-items: center; gap: 12px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-55); }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 140px; height: 1px; background: var(--ink-35); }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--ink); cursor: pointer; }
+  input[type=range]::-moz-range-thumb { width: 12px; height: 12px; border: none; border-radius: 50%; background: var(--ink); cursor: pointer; }
+
+  .mind h3 { font-size: 12px; font-weight: 400; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-80); margin-bottom: 10px; }
+  .senses { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 6px; margin-bottom: 24px; }
+  .sense { font-size: 11.5px; padding: 6px 8px; border: 1px solid var(--ink-15); color: var(--ink-35); transition: color .1s, border-color .1s; }
+  .sense.on { color: var(--ink); border-color: var(--ink-55); }
+  .sense.on.danger { color: var(--amber); border-color: var(--amber); }
+  .qvals { display: grid; gap: 7px; }
+  .q { display: grid; grid-template-columns: 11ch 1fr 7ch; gap: 14px; align-items: center; font-size: 13px; color: var(--ink-55); }
+  .q.pick { color: var(--ink); }
+  .q.pick .fill { background: var(--amber); }
+  .q span:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+  .note { font-size: 12px; color: var(--ink-35); margin-top: 12px; }
+
+  /* --- footer --------------------------------------------------------- */
+  footer { padding: clamp(40px, 6vw, 72px) 0 48px; }
+  .more { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 18px; margin: 18px 0 44px; }
+  .more a { text-decoration: none; display: block; padding-top: 12px; border-top: 1px solid var(--ink-15); transition: border-color .15s; }
+  .more a:hover { border-color: var(--ink); }
+  .more small { color: var(--amber); font-size: 11px; letter-spacing: .1em; }
+  .more span { display: block; font-family: var(--serif); font-size: 22px; line-height: 1.2; margin: 2px 0; }
+  .more em { color: var(--ink-35); font-style: normal; font-size: 12px; }
+  .fine { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--ink-35); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <span>Live demo</span>
+    <nav>
+      <a href="https://github.com/Kiddo4993/train-ai-from-scratch">GitHub ↗</a>
+      <a class="star" href="https://github.com/Kiddo4993/train-ai-from-scratch/stargazers">★ Star</a>
+    </nav>
+  </div>
+
+  <header class="hero">
+    <h1>train-ai-from-scratch</h1>
+    <p class="lede">Two of the five models, trained from scratch and running in your browser. Nothing is sent to a server.</p>
+  </header>
+
+  <!-- 01 supervised ------------------------------------------------------>
+  <section class="specimen" aria-labelledby="draw-title">
+    <div class="label"><span class="num">01</span><span>Supervised</span><span class="metric">99.29% on MNIST</span></div>
+    <h2 id="draw-title">Draw a digit.</h2>
+    <p class="caption">This is the actual 421,642-parameter network from <code>train.py</code>, re-implemented in about 60 lines of plain JavaScript and loaded with its trained weights. It learned from 60,000 handwritten examples.</p>
+    <div class="grid">
+      <div>
+        <div class="frame dotfield"><span class="c3"></span><span class="c4"></span>
+          <canvas id="pad" width="280" height="280" aria-label="Drawing area: draw one digit from 0 to 9"></canvas>
+          <div class="hint" id="hint">draw 0 – 9 here</div>
+        </div>
+        <div class="row"><button id="clear" type="button">Clear</button></div>
+      </div>
+      <div>
+        <div class="readout">
+          <div class="big empty" id="guess" aria-live="polite">?</div>
+          <div class="conf">Confidence<b id="conf">-</b></div>
+        </div>
+        <div class="bars" id="bars"></div>
+        <div class="sees">
+          <canvas id="seen" width="112" height="112" aria-hidden="true"></canvas>
+          <p><b>What the model sees</b>Your drawing cropped, shrunk to 28×28 pixels and centred, exactly like the training images. That's why the size and position of your drawing don't matter.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 reinforcement ---------------------------------------------------->
+  <section class="specimen" aria-labelledby="snake-title">
+    <div class="label"><span class="num">05</span><span>Reinforcement</span><span class="metric">0.2 → 20.1 apples per game</span></div>
+    <h2 id="snake-title">Watch it play Snake.</h2>
+    <p class="caption">Nobody showed this agent a single good move. It played 3,000 games, earning +10 per apple and −10 per crash, and filled in a table of how good each move is in each situation. Switch to <em>Untrained</em> to see where it started.</p>
+    <div class="grid">
+      <div>
+        <div class="frame"><span class="c3"></span><span class="c4"></span>
+          <canvas id="board" width="420" height="420" aria-label="Snake game played by the AI"></canvas>
+        </div>
+        <div class="row">
+          <div class="seg" role="radiogroup" aria-label="Agent">
+            <input type="radio" name="agent" id="trained" value="trained" checked><label for="trained">Trained</label>
+            <input type="radio" name="agent" id="untrained" value="untrained"><label for="untrained">Untrained</label>
+          </div>
+          <label class="speed">Speed <input type="range" id="speed" min="1" max="10" value="5" aria-label="Speed"></label>
+        </div>
+      </div>
+      <div>
+        <div class="stats">
+          <div class="stat hi"><small>Score</small><b id="score">0</b></div>
+          <div class="stat"><small>Best</small><b id="best">0</b></div>
+          <div class="stat"><small>Games</small><b id="games">0</b></div>
+          <div class="stat"><small>Average</small><b id="avg">-</b></div>
+        </div>
+        <div class="mind">
+          <h3>What it senses: 11 yes/no facts</h3>
+          <div class="senses" id="senses"></div>
+          <h3>What it thinks each move is worth</h3>
+          <div class="qvals" id="qvals"></div>
+          <p class="note" id="qnote">Q-values from the trained table. It always picks the highest.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="label"><span>The other three projects</span><span class="metric">clone the repo to run them</span></div>
+    <div class="more">
+      <a href="https://github.com/Kiddo4993/train-ai-from-scratch/blob/main/NOTES.md#fine-tuning-experiment-teaching-it-my-handwriting"><small>02 · TRANSFER</small><span>Handwriting fine-tune</span><em>90 → 93.3% on my writing</em></a>
+      <a href="https://github.com/Kiddo4993/train-ai-from-scratch/tree/main/language_model"><small>03 · SELF-SUPERVISED</small><span>Tiny GPT</span><em>writes Shakespeare</em></a>
+      <a href="https://github.com/Kiddo4993/train-ai-from-scratch/tree/main/autoencoder"><small>04 · UNSUPERVISED</small><span>Variational autoencoder</span><em>784 pixels → 2 numbers</em></a>
+    </div>
+    <div class="fine"><span>MIT licensed · built with PyTorch</span><a href="https://github.com/Kiddo4993/train-ai-from-scratch">github.com/Kiddo4993/train-ai-from-scratch</a></div>
+  </footer>
+</div>
+
+<script type="module">
+import { loadDigitNet, canvasToPixels } from "./digitnet.js";
+import { SnakeGame, chooseAction, SIZE } from "./snake.js";
+
+const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const AMBER = css("--amber"), INK = css("--ink");
+const ink = (a) => `rgba(232, 228, 219, ${a})`;
+
+// Render canvases at device resolution so dots stay crisp on retina screens.
+function hiDPI(canvas, size) {
+  const r = window.devicePixelRatio || 1;
+  canvas.width = canvas.height = Math.round(size * r);
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(r, 0, 0, r, 0, 0);
+  return ctx;
+}
+
+/* ---------------- 01 · draw a digit ---------------- */
+const pad = document.getElementById("pad");
+const PAD_SIZE = 280;  // drawing coordinates; the canvas itself renders at screen resolution
+const DPR = window.devicePixelRatio || 1;
+pad.width = pad.height = Math.round(PAD_SIZE * DPR);
+const pctx = pad.getContext("2d", { willReadFrequently: true });
+pctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+const seen = document.getElementById("seen");
+const sctx = hiDPI(seen, 112);
+const barsEl = document.getElementById("bars");
+const bars = Array.from({ length: 10 }, (_, d) => {
+  const row = document.createElement("div");
+  row.className = "bar";
+  row.innerHTML = `<span>${d}</span><div class="track"><div class="fill"></div></div><span>-</span>`;
+  barsEl.append(row);
+  return { row, fill: row.querySelector(".fill"), pct: row.lastElementChild };
+});
+const guessEl = document.getElementById("guess"), confEl = document.getElementById("conf"), hint = document.getElementById("hint");
+
+function drawSeen(pixels) {
+  sctx.clearRect(0, 0, 112, 112);
+  const step = 4;
+  for (let y = 0; y < 28; y++) for (let x = 0; x < 28; x++) {
+    const v = pixels ? (pixels[y * 28 + x] * 0.3081 + 0.1307) : 0;
+    sctx.beginPath();
+    if (v > 0.08) { sctx.fillStyle = INK; sctx.arc(x * step + 2, y * step + 2, 1.9 * (0.35 + 0.65 * v), 0, 7); }
+    else { sctx.fillStyle = ink(0.16); sctx.arc(x * step + 2, y * step + 2, 0.45, 0, 7); }
+    sctx.fill();
+  }
+}
+drawSeen(null);
+
+let net = null;
+loadDigitNet("digitnet.bin").then((n) => { net = n; update(); });
+
+function update() {
+  const pixels = canvasToPixels(pad);
+  drawSeen(pixels);
+  if (!pixels || !net) {
+    guessEl.textContent = "?"; guessEl.classList.add("empty"); confEl.textContent = net ? "-" : "loading…";
+    bars.forEach((b) => { b.fill.style.width = "0"; b.pct.textContent = "-"; b.row.classList.remove("top"); });
+    return;
+  }
+  const probs = net.predict(pixels);
+  const top = probs.indexOf(Math.max(...probs));
+  guessEl.textContent = top; guessEl.classList.remove("empty");
+  confEl.textContent = `${(probs[top] * 100).toFixed(probs[top] > 0.995 ? 1 : 0)}%`;
+  bars.forEach((b, d) => {
+    b.fill.style.width = `${probs[d] * 100}%`;
+    b.pct.textContent = `${(probs[d] * 100).toFixed(0)}%`;
+    b.row.classList.toggle("top", d === top);
+  });
+}
+
+pctx.lineWidth = 22; pctx.lineCap = "round"; pctx.lineJoin = "round"; pctx.strokeStyle = INK;
+let drawing = false, queued = false;
+const pos = (e) => { const r = pad.getBoundingClientRect(); return [(e.clientX - r.left) * PAD_SIZE / r.width, (e.clientY - r.top) * PAD_SIZE / r.height]; };
+const scheduleUpdate = () => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; update(); }); } };
+pad.addEventListener("pointerdown", (e) => {
+  drawing = true; pad.setPointerCapture(e.pointerId); hint.style.opacity = 0;
+  const [x, y] = pos(e); pctx.beginPath(); pctx.moveTo(x, y); pctx.lineTo(x + 0.01, y); pctx.stroke();
+});
+pad.addEventListener("pointermove", (e) => { if (!drawing) return; const [x, y] = pos(e); pctx.lineTo(x, y); pctx.stroke(); scheduleUpdate(); });
+const end = () => { if (drawing) { drawing = false; update(); } };
+pad.addEventListener("pointerup", end); pad.addEventListener("pointercancel", end);
+document.getElementById("clear").addEventListener("click", () => { pctx.clearRect(0, 0, PAD_SIZE, PAD_SIZE); hint.style.opacity = 1; update(); });
+
+/* ---------------- 05 · snake ---------------- */
+const board = document.getElementById("board");
+let bctx = hiDPI(board, 420);
+const SENSES = ["danger ahead", "danger right", "danger left", "heading up", "heading right", "heading down", "heading left",
+                "food up", "food right", "food down", "food left"];
+const sensesEl = document.getElementById("senses");
+const senseEls = SENSES.map((name, i) => {
+  const el = document.createElement("div");
+  el.className = "sense" + (i < 3 ? " danger" : "");
+  el.textContent = name;
+  sensesEl.append(el);
+  return el;
+});
+const qEl = document.getElementById("qvals");
+const qRows = ["straight", "turn right", "turn left"].map((name) => {
+  const row = document.createElement("div");
+  row.className = "q";
+  row.innerHTML = `<span>${name}</span><div class="track"><div class="fill"></div></div><span>-</span>`;
+  qEl.append(row);
+  return { row, fill: row.querySelector(".fill"), val: row.lastElementChild };
+});
+
+let qTable = null, mode = "trained", game = new SnakeGame(), stateKey = game.state();
+let stats = { best: 0, games: 0, total: 0 }, timer = null;
+fetch("q_table.json").then((r) => r.json()).then((q) => { qTable = q; tick(); });
+
+function drawBoard() {
+  const cell = 420 / SIZE, c = (p) => [(p[0] + 0.5) * cell, (p[1] + 0.5) * cell];
+  bctx.clearRect(0, 0, 420, 420);
+  bctx.fillStyle = ink(0.18);
+  for (let x = 0; x < SIZE; x++) for (let y = 0; y < SIZE; y++) { bctx.beginPath(); bctx.arc((x + .5) * cell, (y + .5) * cell, 1.4, 0, 7); bctx.fill(); }
+  bctx.strokeStyle = INK; bctx.lineWidth = cell * 0.34; bctx.lineCap = "round"; bctx.lineJoin = "round";
+  bctx.beginPath(); game.snake.forEach((p, i) => { const [x, y] = c(p); i ? bctx.lineTo(x, y) : bctx.moveTo(x, y); }); bctx.stroke();
+  const [hx, hy] = c(game.snake[0]); bctx.fillStyle = AMBER; bctx.beginPath(); bctx.arc(hx, hy, cell * 0.3, 0, 7); bctx.fill();
+  const [fx, fy] = c(game.food); bctx.strokeStyle = INK; bctx.lineWidth = 2; bctx.beginPath(); bctx.arc(fx, fy, cell * 0.22, 0, 7); bctx.stroke();
+}
+
+function showMind() {
+  [...stateKey].forEach((bit, i) => senseEls[i].classList.toggle("on", bit === "1"));
+  const table = mode === "trained" ? qTable : null;
+  const values = table ? (table[stateKey] || [0, 0, 0]) : null;
+  const pick = values ? values.indexOf(Math.max(...values)) : -1;
+  const lo = values ? Math.min(...values, 0) : 0, hi = values ? Math.max(...values, 0) : 1;
+  qRows.forEach((r, i) => {
+    r.row.classList.toggle("pick", i === pick);
+    r.fill.style.width = values ? `${((values[i] - lo) / ((hi - lo) || 1)) * 100}%` : "0";
+    r.val.textContent = values ? values[i].toFixed(2) : "?";
+  });
+  document.getElementById("qnote").textContent = values
+    ? "Q-values from the trained table. It always picks the highest."
+    : "Untrained: no table yet, so every move is a coin flip.";
+}
+
+function showStats() {
+  document.getElementById("score").textContent = game.score;
+  document.getElementById("best").textContent = stats.best;
+  document.getElementById("games").textContent = stats.games;
+  document.getElementById("avg").textContent = stats.games ? (stats.total / stats.games).toFixed(1) : "-";
+}
+
+function delay() { return Math.round(260 / Math.pow(1.5, +document.getElementById("speed").value - 1)); }
+
+function tick() {
+  clearTimeout(timer);
+  drawBoard(); showMind(); showStats();
+  const { done } = game.step(chooseAction(mode === "trained" ? qTable : null, stateKey));
+  if (done) {
+    stats.games++; stats.total += game.score; stats.best = Math.max(stats.best, game.score);
+    showStats(); drawBoard();
+    timer = setTimeout(() => { game.reset(); stateKey = game.state(); tick(); }, 700);
+    return;
+  }
+  stateKey = game.state();
+  timer = setTimeout(tick, delay());
+}
+
+document.querySelectorAll('input[name="agent"]').forEach((el) => el.addEventListener("change", () => {
+  mode = el.value; stats = { best: 0, games: 0, total: 0 }; game.reset(); stateKey = game.state(); tick();
+}));
+window.addEventListener("resize", () => { bctx = hiDPI(board, 420); drawBoard(); });
+</script>
+</body>
+</html>
